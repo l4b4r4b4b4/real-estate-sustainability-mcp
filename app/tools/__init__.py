@@ -3,8 +3,7 @@
 This module re-exports all tools from submodules for convenient access.
 
 Tool Modules:
-- context: Langfuse test context management
-- secrets: Private computation with secrets
+- esg: ESG assessment tools for building projects (Phase 1)
 - cache: Cache query and retrieval
 - health: Health check functionality
 """
@@ -12,30 +11,43 @@ Tool Modules:
 from __future__ import annotations
 
 from app.tools.cache import CacheQueryInput, create_get_cached_result
-from app.tools.context import (
-    enable_test_context,
-    get_trace_info,
-    reset_test_context,
-    set_test_context,
+from app.tools.esg import (
+    add_consumption_data,
+    add_energy_data,
+    calculate_carbon_footprint,
+    calculate_energy_intensity,
+    check_data_completeness,
+    check_eu_taxonomy_alignment,
+    create_building_project,
+    delete_building_project,
+    get_building_project,
+    get_project_data,
+    list_building_projects,
+    suggest_data_sources,
+    update_building_project,
 )
 from app.tools.health import create_health_check
-from app.tools.secrets import (
-    SecretComputeInput,
-    SecretInput,
-    create_compute_with_secret,
-    create_store_secret,
-)
 
 __all__ = [
+    # Utility tools
     "CacheQueryInput",
-    "SecretComputeInput",
-    "SecretInput",
-    "create_compute_with_secret",
+    # ESG tools - Data Collection
+    "add_consumption_data",
+    "add_energy_data",
+    # ESG tools - Analysis
+    "calculate_carbon_footprint",
+    "calculate_energy_intensity",
+    # ESG tools - Gap Analysis
+    "check_data_completeness",
+    "check_eu_taxonomy_alignment",
+    # ESG tools - Project Store
+    "create_building_project",
     "create_get_cached_result",
     "create_health_check",
-    "create_store_secret",
-    "enable_test_context",
-    "get_trace_info",
-    "reset_test_context",
-    "set_test_context",
+    "delete_building_project",
+    "get_building_project",
+    "get_project_data",
+    "list_building_projects",
+    "suggest_data_sources",
+    "update_building_project",
 ]

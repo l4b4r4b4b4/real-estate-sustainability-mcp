@@ -4,14 +4,12 @@ This module creates and configures the FastMCP server, wiring together
 tools from the modular tools package.
 
 Features:
+- ESG assessment for existing buildings (Bestandsgebäude)
+- Project store with SQLite persistence
+- Data collection for energy and consumption metrics
+- EU Taxonomy alignment checking
 - Reference-based caching for large results
-- Preview generation (sample, truncate, paginate strategies)
-- Pagination for accessing large datasets
-- Access control (user vs agent permissions)
-- Private computation (EXECUTE without READ)
-
 - Langfuse tracing integration for observability
-
 
 Usage:
     # Run with typer CLI
@@ -24,22 +22,32 @@ Usage:
 
 from __future__ import annotations
 
-from typing import Any
-
 from fastmcp import FastMCP
 from mcp_refcache import PreviewConfig, PreviewStrategy, RefCache
-from mcp_refcache.fastmcp import cache_instructions, register_admin_tools
+from mcp_refcache.fastmcp import cache_instructions
 
 from app.prompts import langfuse_guide, template_guide
 from app.tools import (
-    create_compute_with_secret,
+    # ESG tools - Data Collection
+    add_consumption_data,
+    add_energy_data,
+    # ESG tools - Analysis
+    calculate_carbon_footprint,
+    calculate_energy_intensity,
+    # ESG tools - Gap Analysis
+    check_data_completeness,
+    check_eu_taxonomy_alignment,
+    # ESG tools - Project Store
+    create_building_project,
+    # Utilities
     create_get_cached_result,
     create_health_check,
-    create_store_secret,
-    enable_test_context,
-    get_trace_info,
-    reset_test_context,
-    set_test_context,
+    delete_building_project,
+    get_building_project,
+    get_project_data,
+    list_building_projects,
+    suggest_data_sources,
+    update_building_project,
 )
 from app.tracing import TracedRefCache
 
@@ -49,27 +57,43 @@ from app.tracing import TracedRefCache
 
 mcp = FastMCP(
     name="Real Estate Sustainability Analysis MCP",
-    instructions=f"""MCP server for analyzing building sustainability metrics through Excel, PDF, and standardized frameworks (ESG, LEED, BREEAM, DGNB) with IFC integration
+    instructions=f"""MCP server for ESG assessment of existing commercial buildings (Bestandsgebäude).
 
+Supports the sustainability assessment workflow:
+1. Create building projects and collect data
+2. Analyze data gaps and suggest sources
+3. Calculate energy intensity and carbon footprint
+4. Check EU Taxonomy alignment
 
-All tool calls are traced to Langfuse with:
-- User ID and Session ID from context (for filtering/aggregation)
-- Full context metadata (org_id, agent_id, cache_namespace)
-- Cache operation spans with hit/miss tracking
-
-Enable test mode with enable_test_context() to simulate different users.
+All tool calls are traced to Langfuse with user/session attribution.
 
 
 Available tools:
 
-- store_secret: Store a secret value for private computation
-- compute_with_secret: Use a secret in computation without revealing it
-- get_cached_result: Retrieve or paginate through cached results
+PROJECT STORE:
+- create_building_project: Create a new building for ESG assessment
+- get_building_project: Get project details with all related data
+- update_building_project: Update building details
+- list_building_projects: List all projects with pagination
+- delete_building_project: Delete a project and all data
 
-- enable_test_context: Enable/disable test context for Langfuse demos
-- set_test_context: Set test context values for user attribution
-- reset_test_context: Reset test context to defaults
-- get_trace_info: Get current Langfuse tracing status
+DATA COLLECTION:
+- add_energy_data: Add annual energy consumption (electricity, gas, etc.)
+- add_consumption_data: Add water, waste, and other consumption data
+- get_project_data: Get all collected data for a project
+
+GAP ANALYSIS:
+- check_data_completeness: Check what data is missing
+- suggest_data_sources: Get suggestions for data collection
+
+ESG ANALYSIS:
+- calculate_energy_intensity: Calculate kWh/m²/a with energy rating
+- calculate_carbon_footprint: Calculate kgCO2/m²/a with emission breakdown
+- check_eu_taxonomy_alignment: Check EU Taxonomy Activity 7.7 alignment
+
+UTILITY:
+- get_cached_result: Retrieve or paginate through cached results
+- health_check: Check server health status
 
 
 {cache_instructions()}
@@ -78,7 +102,6 @@ Available tools:
 
 # =============================================================================
 # Initialize RefCache with Langfuse Tracing
-
 # =============================================================================
 
 # Create the base RefCache instance
@@ -91,19 +114,14 @@ _cache = RefCache(
     ),
 )
 
-
 # Wrap with TracedRefCache for Langfuse observability
 cache = TracedRefCache(_cache)
-
 
 # =============================================================================
 # Create Bound Tool Functions
 # =============================================================================
 
 # These are created with factory functions and bound to the cache instance.
-# We keep references for testing and re-export them as module attributes.
-store_secret = create_store_secret(cache)
-compute_with_secret = create_compute_with_secret(cache)
 get_cached_result = create_get_cached_result(cache)
 health_check = create_health_check(_cache)
 
@@ -111,42 +129,30 @@ health_check = create_health_check(_cache)
 # Register Tools
 # =============================================================================
 
+# --- Project Store Tools ---
+mcp.tool(create_building_project)
+mcp.tool(get_building_project)
+mcp.tool(update_building_project)
+mcp.tool(list_building_projects)
+mcp.tool(delete_building_project)
 
-# Context management tools
-mcp.tool(enable_test_context)
-mcp.tool(set_test_context)
-mcp.tool(reset_test_context)
-mcp.tool(get_trace_info)
+# --- Data Collection Tools ---
+mcp.tool(add_energy_data)
+mcp.tool(add_consumption_data)
+mcp.tool(get_project_data)
 
+# --- Gap Analysis Tools ---
+mcp.tool(check_data_completeness)
+mcp.tool(suggest_data_sources)
 
-# Cache-bound tools (using pre-created module-level functions)
-mcp.tool(store_secret)
-mcp.tool(compute_with_secret)
+# --- ESG Analysis Tools ---
+mcp.tool(calculate_energy_intensity)
+mcp.tool(calculate_carbon_footprint)
+mcp.tool(check_eu_taxonomy_alignment)
+
+# --- Utility Tools ---
 mcp.tool(get_cached_result)
 mcp.tool(health_check)
-
-# =============================================================================
-# Admin Tools (Permission-Gated)
-# =============================================================================
-
-
-async def is_admin(ctx: Any) -> bool:
-    """Check if the current context has admin privileges.
-
-    Override this in your own server with proper auth logic.
-    """
-    # Demo: No admin access by default
-    return False
-
-
-# Register admin tools with the underlying cache (not the traced wrapper)
-_admin_tools = register_admin_tools(
-    mcp,
-    _cache,
-    admin_check=is_admin,
-    prefix="admin_",
-    include_dangerous=False,
-)
 
 # =============================================================================
 # Register Prompts

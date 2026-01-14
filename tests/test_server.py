@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from unittest.mock import MagicMock
-
 import pytest
 
 from app.server import cache, mcp
@@ -112,100 +110,6 @@ class TestTracingModule:
         assert "cacheset" in attrs["tags"]
 
 
-class TestContextManagementTools:
-    """Tests for context management tools."""
-
-    def setup_method(self) -> None:
-        """Reset test mode before each test."""
-        enable_test_mode(False)
-        MockContext.reset()
-
-    def teardown_method(self) -> None:
-        """Clean up after each test."""
-        enable_test_mode(False)
-        MockContext.reset()
-
-    def _call_enable_test_context(self, enabled: bool = True) -> dict:
-        """Helper to call enable_test_context tool."""
-        from app import server
-
-        fn = server.enable_test_context
-        if hasattr(fn, "fn"):
-            return fn.fn(enabled)
-        return fn(enabled)
-
-    def _call_set_test_context(self, **kwargs) -> dict:
-        """Helper to call set_test_context tool."""
-        from app import server
-
-        fn = server.set_test_context
-        if hasattr(fn, "fn"):
-            return fn.fn(**kwargs)
-        return fn(**kwargs)
-
-    def _call_reset_test_context(self) -> dict:
-        """Helper to call reset_test_context tool."""
-        from app import server
-
-        fn = server.reset_test_context
-        if hasattr(fn, "fn"):
-            return fn.fn()
-        return fn()
-
-    def _call_get_trace_info(self) -> dict:
-        """Helper to call get_trace_info tool."""
-        from app import server
-
-        fn = server.get_trace_info
-        if hasattr(fn, "fn"):
-            return fn.fn()
-        return fn()
-
-    def test_enable_test_context_returns_status(self) -> None:
-        """Test enable_test_context returns correct status."""
-        result = self._call_enable_test_context(True)
-        assert result["test_mode"] is True
-        assert "context" in result
-        assert "langfuse_enabled" in result
-
-    def test_enable_test_context_disable(self) -> None:
-        """Test disabling test context."""
-        self._call_enable_test_context(True)
-        result = self._call_enable_test_context(False)
-        assert result["test_mode"] is False
-
-    def test_set_test_context_updates_values(self) -> None:
-        """Test set_test_context updates context values."""
-        result = self._call_set_test_context(
-            user_id="alice", org_id="acme", session_id="chat-001"
-        )
-        assert result["context"]["user_id"] == "alice"
-        assert result["context"]["org_id"] == "acme"
-        assert result["context"]["session_id"] == "chat-001"
-
-    def test_set_test_context_auto_enables_test_mode(self) -> None:
-        """Test set_test_context auto-enables test mode."""
-        assert not is_test_mode_enabled()
-        self._call_set_test_context(user_id="bob")
-        assert is_test_mode_enabled()
-
-    def test_reset_test_context(self) -> None:
-        """Test reset_test_context resets to defaults."""
-        self._call_set_test_context(user_id="alice")
-        result = self._call_reset_test_context()
-        assert result["context"]["user_id"] == "demo_user"
-
-    def test_get_trace_info_returns_status(self) -> None:
-        """Test get_trace_info returns tracing status."""
-        result = self._call_get_trace_info()
-        assert "langfuse_enabled" in result
-        assert "langfuse_host" in result
-        assert "public_key_set" in result
-        assert "secret_key_set" in result
-        assert "test_mode_enabled" in result
-        assert "langfuse_attributes" in result
-
-
 class TestHealthCheck:
     """Tests for health_check tool."""
 
@@ -252,139 +156,9 @@ class TestMCPConfiguration:
         """Test that instructions mention caching."""
         assert "cach" in mcp.instructions.lower()
 
-    def test_instructions_mention_secret(self) -> None:
-        """Test that instructions mention secret computation."""
-        assert "secret" in mcp.instructions.lower()
-
-
-class TestStoreSecret:
-    """Tests for the store_secret tool."""
-
-    @pytest.fixture(autouse=True)
-    def _setup_and_teardown(self) -> None:
-        """Clear cache before and after each test."""
-        cache.clear()
-        yield
-        cache.clear()
-
-    def _call_store_secret(self, name: str, value: float) -> dict:
-        """Helper to call store_secret, handling FunctionTool wrapper."""
-        from app import server
-
-        store_fn = server.store_secret
-        if hasattr(store_fn, "fn"):
-            return store_fn.fn(name, value)
-        return store_fn(name, value)
-
-    def test_store_secret_returns_ref_id(self) -> None:
-        """Test that store_secret returns a reference ID."""
-        result = self._call_store_secret("test_secret", 42.0)
-
-        assert "ref_id" in result
-        assert result["ref_id"] is not None
-        assert len(result["ref_id"]) > 0
-
-    def test_store_secret_returns_name(self) -> None:
-        """Test that store_secret returns the secret name."""
-        result = self._call_store_secret("my_key", 100.0)
-
-        assert "name" in result
-        assert result["name"] == "my_key"
-
-    def test_store_secret_returns_message(self) -> None:
-        """Test that store_secret returns a confirmation message."""
-        result = self._call_store_secret("api_key", 12345.0)
-
-        assert "message" in result
-        assert "api_key" in result["message"]
-        assert "compute_with_secret" in result["message"]
-
-    def test_store_secret_returns_permissions(self) -> None:
-        """Test that store_secret returns permission information."""
-        result = self._call_store_secret("credentials", 999.0)
-
-        assert "permissions" in result
-        assert "user" in result["permissions"]
-        assert "agent" in result["permissions"]
-        assert "EXECUTE" in result["permissions"]["agent"]
-
-
-class TestComputeWithSecret:
-    """Tests for the compute_with_secret tool."""
-
-    @pytest.fixture(autouse=True)
-    def _setup_and_teardown(self) -> None:
-        """Clear cache before and after each test."""
-        cache.clear()
-        yield
-        cache.clear()
-
-    def _call_store_secret(self, name: str, value: float) -> dict:
-        """Helper to call store_secret."""
-        from app import server
-
-        store_fn = server.store_secret
-        if hasattr(store_fn, "fn"):
-            return store_fn.fn(name, value)
-        return store_fn(name, value)
-
-    def _call_compute_with_secret(
-        self, secret_ref: str, multiplier: float = 1.0
-    ) -> dict:
-        """Helper to call compute_with_secret."""
-        from app import server
-
-        compute_fn = server.compute_with_secret
-        if hasattr(compute_fn, "fn"):
-            return compute_fn.fn(secret_ref, multiplier)
-        return compute_fn(secret_ref, multiplier)
-
-    def test_compute_with_secret_basic(self) -> None:
-        """Test basic secret computation."""
-        # Store a secret first
-        store_result = self._call_store_secret("compute_test", 10.0)
-        ref_id = store_result["ref_id"]
-
-        # Compute with multiplier
-        result = self._call_compute_with_secret(ref_id, multiplier=2.0)
-
-        assert "result" in result
-        assert result["result"] == 20.0
-        assert result["multiplier"] == 2.0
-
-    def test_compute_with_secret_default_multiplier(self) -> None:
-        """Test computation with default multiplier (1.0)."""
-        store_result = self._call_store_secret("default_mult", 50.0)
-        ref_id = store_result["ref_id"]
-
-        result = self._call_compute_with_secret(ref_id)
-
-        assert result["result"] == 50.0
-        assert result["multiplier"] == 1.0
-
-    def test_compute_with_secret_returns_ref(self) -> None:
-        """Test that result includes the secret reference."""
-        store_result = self._call_store_secret("ref_check", 25.0)
-        ref_id = store_result["ref_id"]
-
-        result = self._call_compute_with_secret(ref_id, multiplier=4.0)
-
-        assert result["secret_ref"] == ref_id
-
-    def test_compute_with_secret_message(self) -> None:
-        """Test that result includes confirmation message."""
-        store_result = self._call_store_secret("msg_check", 1.0)
-        ref_id = store_result["ref_id"]
-
-        result = self._call_compute_with_secret(ref_id)
-
-        assert "message" in result
-        assert "not revealed" in result["message"].lower()
-
-    def test_compute_with_secret_invalid_ref(self) -> None:
-        """Test that invalid reference raises error."""
-        with pytest.raises(ValueError, match="not found"):
-            self._call_compute_with_secret("invalid:ref:id", multiplier=1.0)
+    def test_instructions_mention_esg(self) -> None:
+        """Test that instructions mention ESG assessment."""
+        assert "esg" in mcp.instructions.lower()
 
 
 class TestGetCachedResult:
@@ -396,15 +170,6 @@ class TestGetCachedResult:
         cache.clear()
         yield
         cache.clear()
-
-    def _call_store_secret(self, name: str, value: float) -> dict:
-        """Helper to store a value in cache."""
-        from app import server
-
-        store_fn = server.store_secret
-        if hasattr(store_fn, "fn"):
-            return store_fn.fn(name, value)
-        return store_fn(name, value)
 
     async def _call_get_cached_result(
         self,
@@ -430,48 +195,12 @@ class TestGetCachedResult:
         assert result["ref_id"] == "nonexistent:ref"
 
     @pytest.mark.asyncio
-    async def test_get_cached_result_with_valid_ref(self) -> None:
-        """Test getting a cached result with valid reference."""
-        # Store something first
-        store_result = self._call_store_secret("cached_value", 123.0)
-        ref_id = store_result["ref_id"]
-
-        # Try to get it - may return error due to agent permissions
-        result = await self._call_get_cached_result(ref_id)
-
-        # Should return either data or permission error (agent can't read secrets)
-        assert "ref_id" in result
-
-    @pytest.mark.asyncio
     async def test_get_cached_result_not_found(self) -> None:
         """Test that result includes the requested ref_id."""
         result = await self._call_get_cached_result("test:ref:123")
 
         assert "ref_id" in result
         assert result["ref_id"] == "test:ref:123"
-
-
-class TestIsAdmin:
-    """Tests for the is_admin function."""
-
-    @pytest.mark.asyncio
-    async def test_is_admin_returns_false(self) -> None:
-        """Test that is_admin returns False by default."""
-        from app.server import is_admin
-
-        ctx = MagicMock()
-        result = await is_admin(ctx)
-
-        assert result is False
-
-    @pytest.mark.asyncio
-    async def test_is_admin_with_none_context(self) -> None:
-        """Test that is_admin handles None context."""
-        from app.server import is_admin
-
-        result = await is_admin(None)
-
-        assert result is False
 
 
 class TestTyperCLI:

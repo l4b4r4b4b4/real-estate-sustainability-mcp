@@ -1,0 +1,115 @@
+{
+  "board": {
+    "name": "Storyboard – 9 Steps",
+    "type": "miro_postit_brainstorm",
+    "grid": [
+      {
+        "row": 1,
+        "column": 1,
+        "suggested_title": "Opening Scenario & Responsibility Context",
+        "notes": [
+          "Wir bereiten das Budget vor",
+          "Klöpper Haus",
+          "2 Mieter gehen raus (oder sonstige)",
+          "Du bist verantwortlich für Objektstrategie"
+        ],
+        "meta_notes": [
+          "Datengrundlage – Wolfgang + Tristan",
+          "Einstiegsszenario beschreiben – Ursula"
+        ]
+      },
+      {
+        "row": 1,
+        "column": 2,
+        "suggested_title": "Initial System Entry & Object Overview",
+        "notes": [
+          "Begrüßung im Interface",
+          "Dashboard wie Notebook im",
+          "Dein Objekt das du betreust → Klöpperhaus"
+        ],
+        "meta_notes": ["Text – Ursula"]
+      },
+      {
+        "row": 1,
+        "column": 3,
+        "suggested_title": "User Intent & Goal Definition",
+        "notes": [
+          "Interface 3 Teilung",
+          "Was willst du machen",
+          "Input: Ich will die Maßnahmen optimieren (Nachhaltigkeit)"
+        ],
+        "meta_notes": ["Text – Ursula"]
+      },
+      {
+        "row": 2,
+        "column": 1,
+        "suggested_title": "Document Intake & Gaps",
+        "notes": [
+          "Ich habe folgende Dokumente gefunden",
+          "Fehlt noch was…",
+          "wir fügen Dokument hinzu"
+        ],
+        "meta_notes": ["Datengrundlage – Wolfgang + Tristan"]
+      },
+      {
+        "row": 2,
+        "column": 2,
+        "suggested_title": "ESG Status & Data Validation",
+        "notes": [
+          "ESG Status Bestimmung",
+          "Datenqualitätsprüfung",
+          "Mieter Stromverbräuche liegen nicht vor, hast Du Daten, oder soll ich schätzen",
+          "Vergleich? Benchmark?"
+        ],
+        "meta_notes": ["Anja + Tristan / Christina", "Text – Ursula"]
+      },
+      {
+        "row": 2,
+        "column": 3,
+        "suggested_title": "Measures Identification & Assessment",
+        "notes": [
+          "Maßnahmenplanung mit Budgets",
+          "Identifikation der ESG relevanten Maßnahmen",
+          "Bewertet Maßnahmen",
+          "Anlagen und deren Zustände"
+        ],
+        "meta_notes": ["Datengrundlage – Wolfgang + Tristan"]
+      },
+      {
+        "row": 3,
+        "column": 1,
+        "suggested_title": "Strategy Options & Benchmarking",
+        "notes": [
+          "Rückfragen bzw Bestätigung der Objektziele / Strategie",
+          "Schlägt weitere Maßnahmen vor mit Kosten und Nachhaltigkeitsverbesserungen",
+          "Szenarien – Strategie (Alternativen)",
+          "Willst du Vergleich Benchmark"
+        ],
+        "meta_notes": ["Anja + Christina"]
+      },
+      {
+        "row": 3,
+        "column": 2,
+        "suggested_title": "Results Presentation & Decision Support",
+        "notes": [
+          "Wie kann ich Dir das darstellen? für welche ZG?",
+          "Output",
+          "Soll ich das mal im KI Gremium diskutieren"
+        ],
+        "meta_notes": ["Tristan + Notebook LM"]
+      },
+      {
+        "row": 3,
+        "column": 3,
+        "suggested_title": "Feedback, Adoption & Trust",
+        "notes": [
+          "Will you use?",
+          "Würdest du dev unterstützen",
+          "Steht du hinter dem Ergebnis?",
+          "Ist dieses Tool besser als alles was du bisher gesehen hast?"
+        ],
+        "meta_notes": ["Text – Ursula"]
+      }
+    ]
+  }
+}

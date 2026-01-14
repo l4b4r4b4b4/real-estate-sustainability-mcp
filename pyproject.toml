@@ -1,6 +1,6 @@
 [project]
 name = "real-estate-sustainability-mcp"
-version = "0.0.1"
+version = "0.0.2"
 description = "MCP server for analyzing building sustainability metrics through Excel, PDF, and standardized frameworks (ESG, LEED, BREEAM, DGNB) with IFC integration"
 readme = "README.md"
 authors = [

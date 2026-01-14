@@ -1,9 +1,10 @@
 # Goal 03: Publish v0.0.0 to PyPI
 
-> **Status**: ⚪ Not Started
+> **Status**: 🟢 Complete
 > **Priority**: P0 (Critical)
-> **Created**: 2024-01-XX
-> **Updated**: 2024-01-XX
+> **Created**: 2026-01-14
+> **Updated**: 2026-01-14
+> **Completed**: 2026-01-14
 
 ## Overview
 
@@ -11,11 +12,12 @@ Publish the first version (v0.0.0) of `real-estate-sustainability-mcp` to PyPI. 
 
 ## Success Criteria
 
-- [ ] Package builds successfully with `uv build`
-- [ ] `uv publish` or GitHub Actions publishes to PyPI
-- [ ] Package installable via `uvx real-estate-sustainability-mcp`
-- [ ] Server starts after install: `uvx real-estate-sustainability-mcp --help`
-- [ ] Version 0.0.0 visible on https://pypi.org/project/real-estate-sustainability-mcp/
+- [x] Package builds successfully with `uv build`
+- [x] `uv publish` or GitHub Actions publishes to PyPI
+- [x] Package installable via `uvx real-estate-sustainability-mcp`
+- [x] Server starts after install: `uvx real-estate-sustainability-mcp --help`
+- [x] Version 0.0.0 visible on https://pypi.org/project/real-estate-sustainability-mcp/
+- [x] v0.0.1 also published (fixed project name references)
 
 ## Context & Background
 
@@ -53,14 +55,16 @@ The project has GitHub Actions configured for PyPI trusted publisher.
 
 | Task ID | Description | Status | Depends On |
 |---------|-------------|--------|------------|
-| Task-01 | Verify tests pass and lint clean | ⚪ | Goal-01 |
-| Task-02 | Update CHANGELOG.md for v0.0.0 | ⚪ | - |
-| Task-03 | Build package locally: `uv build` | ⚪ | Task-01 |
-| Task-04 | Test local install: `uv pip install dist/*.whl` | ⚪ | Task-03 |
-| Task-05 | Configure PyPI trusted publisher (if not done) | ⚪ | - |
-| Task-06 | Create and push git tag `v0.0.0` | ⚪ | Task-04 |
-| Task-07 | Verify GitHub Actions publish workflow | ⚪ | Task-06 |
-| Task-08 | Test installation: `uvx real-estate-sustainability-mcp --help` | ⚪ | Task-07 |
+| Task-01 | Verify tests pass and lint clean | 🟢 | Goal-01 |
+| Task-02 | Update CHANGELOG.md for v0.0.0 | 🟢 | - |
+| Task-03 | Build package locally: `uv build` | 🟢 | Task-01 |
+| Task-04 | Test local install: `uv pip install dist/*.whl` | 🟢 | Task-03 |
+| Task-05 | Configure PyPI trusted publisher (if not done) | 🟢 | - |
+| Task-06 | Create and push git tag `v0.0.0` | 🟢 | Task-04 |
+| Task-07 | Verify GitHub Actions publish workflow | 🟢 | Task-06 |
+| Task-08 | Test installation: `uvx real-estate-sustainability-mcp --help` | 🟢 | Task-07 |
+| Task-09 | Fix remaining template references, publish v0.0.1 | 🟢 | Task-08 |
+| Task-10 | Set up self-hosted GitHub Actions runner | 🟢 | - |
 
 ## PyPI Trusted Publisher Setup
 
@@ -127,8 +131,37 @@ uvx real-estate-sustainability-mcp streamable-http --port 8001
 
 ### Open Questions
 
-- [ ] Is PyPI name `real-estate-sustainability-mcp` available?
-- [ ] Is trusted publisher already configured from template?
+- [x] Is PyPI name `real-estate-sustainability-mcp` available? **Yes - claimed**
+- [x] Is trusted publisher already configured from template? **No - configured manually**
+
+## Completion Summary
+
+**Date**: 2026-01-14
+
+### What was done:
+1. Created GitHub repo: https://github.com/l4b4r4b4b4/real-estate-sustainability-mcp
+2. Configured PyPI trusted publisher for `publish.yml` workflow
+3. Published v0.0.0 to PyPI (first release)
+4. Found and fixed remaining `fastmcp-template` references in CLI
+5. Published v0.0.1 to PyPI (fixed project name)
+6. Set up self-hosted GitHub Actions runner on Threadripper workstation
+7. Configured `RUNNER_LABEL` repo variable to use self-hosted runner
+
+### Releases:
+- v0.0.0: Initial release, validates package structure
+- v0.0.1: Fixed CLI name display (`real-estate-sustainability-mcp 0.0.1`)
+
+### Self-hosted runner configured:
+- Labels: `self-hosted`, `nixos`, `threadripper`, `64-core`
+- 32-core / 64-thread AMD Threadripper 3970X
+- 64GB RAM
+- Future workflows will use this runner for faster builds
+
+### PyPI Package:
+```bash
+uvx real-estate-sustainability-mcp --version
+# Output: real-estate-sustainability-mcp 0.0.1
+```
 
 ## References
 
