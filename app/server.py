@@ -36,17 +36,12 @@ from app.tools import (
     create_get_cached_result,
     create_health_check,
     create_store_secret,
-
     enable_test_context,
     get_trace_info,
     reset_test_context,
     set_test_context,
-
-
 )
-
 from app.tracing import TracedRefCache
-
 
 # =============================================================================
 # Initialize FastMCP Server
@@ -117,7 +112,6 @@ health_check = create_health_check(_cache)
 # =============================================================================
 
 
-
 # Context management tools
 mcp.tool(enable_test_context)
 mcp.tool(set_test_context)
@@ -165,9 +159,7 @@ def _template_guide() -> str:
     return template_guide()
 
 
-
 @mcp.prompt
 def _langfuse_guide() -> str:
     """Guide for using Langfuse tracing with this server."""
     return langfuse_guide()
-

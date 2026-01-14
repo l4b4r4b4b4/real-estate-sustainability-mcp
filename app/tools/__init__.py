@@ -1,9 +1,8 @@
-"""Tools module for FastMCP Template Server.
+"""Tools module for Real Estate Sustainability MCP Server.
 
 This module re-exports all tools from submodules for convenient access.
 
 Tool Modules:
-- demo: Simple demonstration tools (hello, generate_items)
 - context: Langfuse test context management
 - secrets: Private computation with secrets
 - cache: Cache query and retrieval
@@ -19,7 +18,6 @@ from app.tools.context import (
     reset_test_context,
     set_test_context,
 )
-from app.tools.demo import ItemGenerationInput, generate_items, hello
 from app.tools.health import create_health_check
 from app.tools.secrets import (
     SecretComputeInput,
@@ -30,7 +28,6 @@ from app.tools.secrets import (
 
 __all__ = [
     "CacheQueryInput",
-    "ItemGenerationInput",
     "SecretComputeInput",
     "SecretInput",
     "create_compute_with_secret",
@@ -38,9 +35,7 @@ __all__ = [
     "create_health_check",
     "create_store_secret",
     "enable_test_context",
-    "generate_items",
     "get_trace_info",
-    "hello",
     "reset_test_context",
     "set_test_context",
 ]

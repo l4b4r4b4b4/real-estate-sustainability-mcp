@@ -5,68 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.0.3] - 2024-12-14
+## [Unreleased]
+
+### Planned
+
+- Excel spreadsheet analysis for sustainability data
+- PDF parsing for building reports and certifications
+- ESG (Environmental, Social, Governance) scoring tools
+- LEED certification analysis
+- BREEAM assessment tools
+- DGNB evaluation tools
+- IFC file parsing for building information modeling
+
+## [0.0.0] - 2026-01-14
 
 ### Added
 
-- **Template usage documentation** - "Using This Template" section in README
-- **Rename instructions** - Step-by-step guide to rename project for your own use
-- **Tool creation guide** - How to add new tools to the template
-
-### Changed
-
-- **README improvements** - Updated CLI examples, project structure, Docker instructions
-- **Fixed outdated references** - Removed Chainguard references, updated workflow names
-
-## [0.0.2] - 2024-12-14
-
-### Fixed
-
-- **Docker image**: Replace Chainguard with `python:slim` base image
-  - Chainguard free tier only offers Python 3.14
-  - Langfuse doesn't support Python 3.14 yet (pydantic v1 compatibility)
-- **Version detection**: Handle `PackageNotFoundError` when running from source
-  - Falls back to `0.0.0-dev` for Docker source-copy builds
-
-### Changed
-
-- **Python support**: Drop Python 3.14 from CI matrix (3.12 and 3.13 only)
-- **Docker**: Add `PYTHON_VERSION` build arg (default: 3.12)
-- **Zed settings**: Use `uvx fastmcp-template stdio` (PyPI install)
-
-## [0.0.1] - 2024-12-14
-
-### Added
-
-- Initial release of FastMCP Template
-- Core server implementation with mcp-refcache integration
-- Example tools demonstrating caching patterns:
-  - `hello` - Simple greeting tool (no caching)
-  - `generate_items` - Generate items with public namespace caching
+- **Initial release** of Real Estate Sustainability MCP Server
+- Core server implementation with FastMCP and mcp-refcache integration
+- Langfuse tracing for observability with user/session attribution
+- Core tools:
+  - `health_check` - Server health status and cache info
   - `store_secret` - Store secrets with EXECUTE-only agent permissions
   - `compute_with_secret` - Private computation without revealing values
   - `get_cached_result` - Paginate through cached results
-  - `health_check` - Server health status
-- Admin tools registration (permission-gated)
-- Template guide prompt for usage instructions
-- CLI with stdio and SSE transport options
-- Project configuration:
-  - UV-based dependency management
-  - Nix flake for reproducible development environment
-  - Ruff linting and formatting
-  - Pytest with asyncio support
-  - Pre-commit hooks (ruff, mypy, bandit, safety)
+- Context management tools for Langfuse testing:
+  - `enable_test_context` - Enable/disable test context mode
+  - `set_test_context` - Set user/session context for tracing
+  - `reset_test_context` - Reset to default context values
+  - `get_trace_info` - Get current Langfuse tracing status
+- Admin tools (permission-gated) for cache management
+- Sustainability guide and Langfuse guide prompts
+- CLI with multiple transport options:
+  - `stdio` - Local CLI mode
+  - `sse` - Server-Sent Events transport
+  - `streamable-http` - Recommended for remote/Docker deployment
+- Docker support with multi-stage builds
 - GitHub Actions workflows:
   - CI pipeline with Python 3.12/3.13 matrix
-  - Release workflow for version tags
-- IDE configuration:
-  - Zed settings with Pyright LSP and MCP context servers
-  - GitHub Copilot instructions
-- Documentation:
-  - Contributing guidelines
-  - Project rules for AI coding assistants
+  - Release workflow for GHCR image publishing
+  - Publish workflow for PyPI releases
+- Full test suite (92 tests passing)
 
-[Unreleased]: https://github.com/l4b4r4b4b4/fastmcp-template/compare/v0.0.3...HEAD
-[0.0.3]: https://github.com/l4b4r4b4b4/fastmcp-template/releases/tag/v0.0.3
-[0.0.2]: https://github.com/l4b4r4b4b4/fastmcp-template/releases/tag/v0.0.2
-[0.0.1]: https://github.com/l4b4r4b4b4/fastmcp-template/releases/tag/v0.0.1
+### Notes
+
+This is the first experimental release. The package structure and release
+workflow are validated, but domain-specific sustainability tools are not
+yet implemented. See "Planned" section for upcoming features.
+
+[Unreleased]: https://github.com/l4b4r4b4b4/real-estate-sustainability-mcp/compare/v0.0.0...HEAD
+[0.0.0]: https://github.com/l4b4r4b4b4/real-estate-sustainability-mcp/releases/tag/v0.0.0

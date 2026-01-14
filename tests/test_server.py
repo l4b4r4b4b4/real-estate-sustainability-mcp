@@ -1,4 +1,4 @@
-"""Tests for the fastmcp-template server module."""
+"""Tests for the real-estate-sustainability-mcp server module."""
 
 from __future__ import annotations
 
@@ -22,36 +22,12 @@ class TestServerInitialization:
     def test_mcp_instance_exists(self) -> None:
         """Test that FastMCP instance is created."""
         assert mcp is not None
-        assert mcp.name == "FastMCP Template"
+        assert mcp.name == "Real Estate Sustainability Analysis MCP"
 
     def test_cache_instance_exists(self) -> None:
         """Test that RefCache instance is created."""
         assert cache is not None
-        assert cache.name == "fastmcp-template"
-
-
-class TestHelloTool:
-    """Tests for the hello tool."""
-
-    def _call_hello(self, name: str = "World") -> dict:
-        """Helper to call hello, handling FunctionTool wrapper."""
-        from app import server
-
-        hello_fn = server.hello
-        if hasattr(hello_fn, "fn"):
-            return hello_fn.fn(name)
-        return hello_fn(name)
-
-    def test_hello_default(self) -> None:
-        """Test hello with default name."""
-        result = self._call_hello()
-        assert result["message"] == "Hello, World!"
-        assert result["server"] == "fastmcp-template"
-
-    def test_hello_custom_name(self) -> None:
-        """Test hello with custom name."""
-        result = self._call_hello("Alice")
-        assert result["message"] == "Hello, Alice!"
+        assert cache.name == "real-estate-sustainability-mcp"
 
 
 class TestTracingModule:
@@ -254,14 +230,14 @@ class TestHealthCheck:
         result = self._call_health_check()
 
         assert "server" in result
-        assert result["server"] == "fastmcp-template"
+        assert result["server"] == "real-estate-sustainability-mcp"
 
     def test_health_check_returns_cache_name(self) -> None:
         """Test that health check returns cache name."""
         result = self._call_health_check()
 
         assert "cache" in result
-        assert result["cache"] == "fastmcp-template"
+        assert result["cache"] == "real-estate-sustainability-mcp"
 
 
 class TestMCPConfiguration:
@@ -279,80 +255,6 @@ class TestMCPConfiguration:
     def test_instructions_mention_secret(self) -> None:
         """Test that instructions mention secret computation."""
         assert "secret" in mcp.instructions.lower()
-
-
-class TestGenerateItems:
-    """Tests for the generate_items tool."""
-
-    @pytest.fixture(autouse=True)
-    def _setup_and_teardown(self) -> None:
-        """Clear cache before and after each test."""
-        cache.clear()
-        yield
-        cache.clear()
-
-    def _get_generate_items_fn(self):
-        """Get the underlying function from generate_items tool."""
-        from app import server
-
-        generate_fn = server.generate_items
-        # Unwrap FunctionTool and cached decorator
-        fn = generate_fn.fn if hasattr(generate_fn, "fn") else generate_fn
-        # If it's still wrapped by @cache.cached, get the inner function
-        if hasattr(fn, "__wrapped__"):
-            return fn.__wrapped__
-        return fn
-
-    @pytest.mark.asyncio
-    async def test_generate_items_default(self) -> None:
-        """Test generate_items with default parameters."""
-        from app import server
-
-        generate_fn = server.generate_items
-        fn = generate_fn.fn if hasattr(generate_fn, "fn") else generate_fn
-
-        result = await fn()
-
-        # Result may be raw list or CacheResponse depending on caching
-        if isinstance(result, list):
-            assert len(result) == 10
-            assert result[0]["id"] == 0
-            assert result[0]["name"] == "item_0"
-            assert result[0]["value"] == 0
-        else:
-            # If cached, should have preview or data
-            assert result is not None
-
-    @pytest.mark.asyncio
-    async def test_generate_items_custom_params(self) -> None:
-        """Test generate_items with custom count."""
-        from app import server
-
-        generate_fn = server.generate_items
-        fn = generate_fn.fn if hasattr(generate_fn, "fn") else generate_fn
-
-        result = await fn(count=5, prefix="widget")
-
-        if isinstance(result, list):
-            assert len(result) == 5
-            assert result[0]["name"] == "widget_0"
-            assert result[4]["name"] == "widget_4"
-
-    @pytest.mark.asyncio
-    async def test_generate_items_large_count(self) -> None:
-        """Test that generated items have correct structure."""
-        from app import server
-
-        generate_fn = server.generate_items
-        fn = generate_fn.fn if hasattr(generate_fn, "fn") else generate_fn
-
-        result = await fn(count=3, prefix="test")
-
-        if isinstance(result, list):
-            for item in result:
-                assert "id" in item
-                assert "name" in item
-                assert "value" in item
 
 
 class TestStoreSecret:
@@ -621,34 +523,6 @@ class TestTyperCLI:
 class TestPydanticModels:
     """Tests for Pydantic input models."""
 
-    def test_item_generation_input_defaults(self) -> None:
-        """Test ItemGenerationInput default values."""
-        from app.tools.demo import ItemGenerationInput
-
-        model = ItemGenerationInput()
-        assert model.count == 10
-        assert model.prefix == "item"
-
-    def test_item_generation_input_custom(self) -> None:
-        """Test ItemGenerationInput with custom values."""
-        from app.tools.demo import ItemGenerationInput
-
-        model = ItemGenerationInput(count=50, prefix="widget")
-        assert model.count == 50
-        assert model.prefix == "widget"
-
-    def test_item_generation_input_validation(self) -> None:
-        """Test ItemGenerationInput validates count range."""
-        from pydantic import ValidationError
-
-        from app.tools.demo import ItemGenerationInput
-
-        with pytest.raises(ValidationError):
-            ItemGenerationInput(count=0)  # Below minimum
-
-        with pytest.raises(ValidationError):
-            ItemGenerationInput(count=20000)  # Above maximum
-
     def test_secret_input(self) -> None:
         """Test SecretInput model."""
         from app.tools.secrets import SecretInput
@@ -700,8 +574,8 @@ class TestPydanticModels:
         assert model.max_size is None
 
 
-class TestTemplateGuidePrompt:
-    """Tests for the template_guide prompt."""
+class TestSustainabilityGuidePrompt:
+    """Tests for the sustainability guide prompt."""
 
     def _call_template_guide(self) -> str:
         """Helper to call template_guide prompt."""
@@ -712,28 +586,23 @@ class TestTemplateGuidePrompt:
             return prompt_fn.fn()
         return prompt_fn()
 
-    def test_template_guide_returns_string(self) -> None:
-        """Test that template_guide returns a string."""
+    def test_sustainability_guide_returns_string(self) -> None:
+        """Test that sustainability guide returns a string."""
         result = self._call_template_guide()
         assert isinstance(result, str)
         assert len(result) > 0
 
-    def test_template_guide_mentions_hello(self) -> None:
-        """Test that guide mentions hello tool."""
+    def test_sustainability_guide_mentions_sustainability(self) -> None:
+        """Test that guide mentions sustainability."""
         result = self._call_template_guide()
-        assert "hello" in result.lower()
+        assert "sustainability" in result.lower()
 
-    def test_template_guide_mentions_generate_items(self) -> None:
-        """Test that guide mentions generate_items tool."""
+    def test_sustainability_guide_mentions_health_check(self) -> None:
+        """Test that guide mentions health_check tool."""
         result = self._call_template_guide()
-        assert "generate_items" in result
+        assert "health_check" in result
 
-    def test_template_guide_mentions_pagination(self) -> None:
-        """Test that guide mentions pagination."""
-        result = self._call_template_guide()
-        assert "paginate" in result.lower() or "page" in result.lower()
-
-    def test_template_guide_mentions_secret(self) -> None:
+    def test_sustainability_guide_mentions_secret(self) -> None:
         """Test that guide mentions secret computation."""
         result = self._call_template_guide()
         assert "secret" in result.lower()

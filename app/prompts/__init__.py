@@ -1,4 +1,4 @@
-"""Prompts module for FastMCP Template Server.
+"""Prompts module for Real Estate Sustainability MCP Server.
 
 This module contains MCP prompts that provide guidance and documentation
 for using the server features.
@@ -8,7 +8,13 @@ from __future__ import annotations
 
 from mcp_refcache.fastmcp import cache_guide_prompt
 
-TEMPLATE_GUIDE = f"""# FastMCP Template Guide
+SUSTAINABILITY_GUIDE = f"""# Real Estate Sustainability MCP Guide
+
+## Overview
+
+This MCP server provides tools for analyzing building sustainability metrics
+through Excel, PDF, and standardized frameworks (ESG, LEED, BREEAM, DGNB)
+with IFC integration.
 
 ## Langfuse Tracing
 
@@ -32,26 +38,17 @@ All tool calls are traced to Langfuse with user/session attribution.
 4. **View in Langfuse Dashboard**
    - Filter by User: "alice"
    - Filter by Session: "chat-001"
-   - Filter by Tags: "fastmcptemplate", "mcprefcache"
+   - Filter by Tags: "real-estate-sustainability", "mcprefcache"
 
-## Quick Start
+## Available Tools
 
-1. **Simple Tool**
-   Use `hello` for a basic greeting:
-   - `hello("World")` → "Hello, World!"
+### Core Tools
+- `health_check`: Check server status and cache health
 
-2. **Generate Items (Caching Demo)**
-   Use `generate_items` to create a list:
-   - `generate_items(count=100, prefix="widget")`
-   - Returns ref_id + preview for large results
-   - Cached in the PUBLIC namespace (shared)
+### Cache Tools
+- `get_cached_result`: Retrieve or paginate through cached results
 
-3. **Paginate Results**
-   Use `get_cached_result` to navigate large results:
-   - `get_cached_result(ref_id, page=2, page_size=20)`
-
-## Private Computation
-
+### Private Computation
 Store values that agents can use but not see:
 
 ```
@@ -63,6 +60,21 @@ store_secret("api_key_hash", 12345.0)
 compute_with_secret(ref_id, multiplier=2.0)
 # Returns the result
 ```
+
+## Planned Tools (Coming Soon)
+
+### Document Analysis
+- Excel spreadsheet analysis for sustainability data
+- PDF parsing for building reports and certifications
+
+### Sustainability Frameworks
+- ESG (Environmental, Social, Governance) scoring
+- LEED certification analysis
+- BREEAM assessment
+- DGNB evaluation
+
+### Building Data
+- IFC file parsing for building information modeling
 
 ---
 
@@ -108,11 +120,12 @@ All tool calls automatically propagate context to Langfuse traces:
 enable_test_context(True)
 set_test_context(user_id="alice", session_id="demo-session")
 
-# 2. Generate items (traced with user attribution)
-result = generate_items(count=100, prefix="widget")
+# 2. Check server health (traced with user attribution)
+result = health_check()
 
-# 3. Retrieve cached result (same user in trace)
-cached = get_cached_result(result["ref_id"])
+# 3. Store and compute with secrets
+ref = store_secret("my_value", 100.0)
+computed = compute_with_secret(ref["ref_id"], multiplier=2.0)
 
 # 4. Check trace info
 info = get_trace_info()
@@ -125,7 +138,7 @@ info = get_trace_info()
 3. Filter by:
    - **User**: "alice" (or any user_id you set)
    - **Session**: "demo-session"
-   - **Tags**: "fastmcptemplate", "mcprefcache", "cacheset", "cacheget"
+   - **Tags**: "real-estate-sustainability", "mcprefcache", "cacheset", "cacheget"
    - **Metadata**: orgid, agentid, cachenamespace
 
 ## Best Practices
@@ -138,8 +151,12 @@ info = get_trace_info()
 
 
 def template_guide() -> str:
-    """Guide for using this MCP server template."""
-    return TEMPLATE_GUIDE
+    """Guide for using this MCP server.
+
+    Note: Function kept as template_guide for backward compatibility
+    with server.py registration.
+    """
+    return SUSTAINABILITY_GUIDE
 
 
 def langfuse_guide() -> str:
@@ -149,7 +166,7 @@ def langfuse_guide() -> str:
 
 __all__ = [
     "LANGFUSE_GUIDE",
-    "TEMPLATE_GUIDE",
+    "SUSTAINABILITY_GUIDE",
     "langfuse_guide",
     "template_guide",
 ]
