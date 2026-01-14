@@ -73,6 +73,16 @@
               echo "⚠️  No pyproject.toml found. Run 'uv init' to create project."
             fi
 
+            # Install pre-commit hooks if not already installed
+            if [ -f ".pre-commit-config.yaml" ]; then
+              if [ ! -f ".git/hooks/pre-commit" ]; then
+                echo "🔧 Installing pre-commit hooks..."
+                uv run pre-commit install --install-hooks
+              else
+                echo "✅ Pre-commit hooks: installed"
+              fi
+            fi
+
             echo ""
             echo "✅ Python: $(python --version)"
             echo "✅ uv:     $(uv --version)"
