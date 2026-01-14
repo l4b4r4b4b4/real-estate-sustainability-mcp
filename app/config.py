@@ -32,7 +32,7 @@ def _get_default_sqlite_path() -> str:
     else:
         base_dir = Path.home() / ".local" / "share"
 
-    return str(base_dir / "fastmcp-template" / "cache.db")
+    return str(base_dir / "real-estate-sustainability-mcp" / "cache.db")
 
 
 class Settings(BaseSettings):

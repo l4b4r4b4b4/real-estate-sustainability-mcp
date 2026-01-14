@@ -1,9 +1,9 @@
-"""CLI entry point for FastMCP Template Server.
+"""CLI entry point for Real Estate Sustainability MCP Server.
 
 Usage:
-    uvx fastmcp-template stdio           # Local CLI mode (Claude Desktop)
-    uvx fastmcp-template sse             # SSE server mode (deprecated)
-    uvx fastmcp-template streamable-http # Streamable HTTP (recommended for remote)
+    uvx real-estate-sustainability-mcp stdio           # Local CLI mode (Claude Desktop)
+    uvx real-estate-sustainability-mcp sse             # SSE server mode (deprecated)
+    uvx real-estate-sustainability-mcp streamable-http # Streamable HTTP (recommended for remote)
 
 Environment Variables:
     FASTMCP_PORT: Server port for HTTP modes (default: 8000)
@@ -20,8 +20,8 @@ import sys
 import typer
 
 app = typer.Typer(
-    name="fastmcp-template",
-    help="FastMCP Template Server with RefCache and Langfuse Tracing",
+    name="real-estate-sustainability-mcp",
+    help="Real Estate Sustainability MCP Server with RefCache and Langfuse Tracing",
     add_completion=False,
 )
 
@@ -161,15 +161,16 @@ def main(
         False, "--version", "-v", help="Show version and exit"
     ),
 ) -> None:
-    """FastMCP Template Server with RefCache and Langfuse Tracing.
+    """Real Estate Sustainability MCP Server with RefCache and Langfuse Tracing.
 
-    A production-ready MCP server template demonstrating best practices
-    for building Model Context Protocol servers with caching and observability.
+    An MCP server for analyzing building sustainability metrics through
+    Excel, PDF, and standardized frameworks (ESG, LEED, BREEAM, DGNB)
+    with IFC integration.
     """
     if version:
         from . import __version__
 
-        typer.echo(f"fastmcp-template {__version__}")
+        typer.echo(f"real-estate-sustainability-mcp {__version__}")
         raise typer.Exit()
 
     # If no command provided, show help

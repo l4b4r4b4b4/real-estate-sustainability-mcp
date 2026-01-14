@@ -1,1 +1,1 @@
-"""Tests for fastmcp-template MCP server."""
+"""Tests for real-estate-sustainability-mcp MCP server."""
