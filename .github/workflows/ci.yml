@@ -1,17 +1,14 @@
-# CI Pipeline for FastMCP Template
+# CI Pipeline for Real Estate Sustainability MCP
 #
 # Workflow Design:
 # - Triggers on PRs to main (required checks before merge)
 # - Triggers on push to main (post-merge verification)
 # - Does NOT trigger Docker builds (that's in cd.yml, only after CI passes)
 #
-# Branch Strategy:
-# - main: Production branch, protected, requires PR
-# - feature/*, fix/*, docs/*: Development branches
-#
 # Runner Support:
-# - Uses GitHub-hosted runners by default
-# - Can use self-hosted runners with `runs-on: self-hosted` label
+# - Uses GitHub-hosted runners by default (ubuntu-latest)
+# - Supports self-hosted NixOS runners with system Python/uv
+# - Self-hosted runners skip setup-python (uses extraPackages)
 
 name: CI
 
@@ -41,15 +38,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      # Only setup Python on GitHub-hosted runners
+      # Self-hosted NixOS runners have python312 in extraPackages
+      - name: Set up Python (GitHub-hosted only)
+        if: ${{ !contains(runner.name, 'self-hosted') && runner.environment != 'self-hosted' }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install uv
+      - name: Install uv (GitHub-hosted only)
+        if: ${{ !contains(runner.name, 'self-hosted') && runner.environment != 'self-hosted' }}
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+
+      - name: Verify Python and uv available
+        run: |
+          echo "Python: $(which python3 || which python)"
+          python3 --version || python --version
+          echo "UV: $(which uv)"
+          uv --version
 
       # Configure git to use GH_PAT for private repos
       - name: Configure git for private repos
@@ -66,27 +74,33 @@ jobs:
         run: uv run ruff format --check .
 
   test:
-    name: Test (Python ${{ matrix.python-version }})
+    name: Test (Python 3.12)
     runs-on: ${{ vars.RUNNER_LABEL || 'ubuntu-latest' }}
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.12", "3.13"]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      # Only setup Python on GitHub-hosted runners
+      - name: Set up Python (GitHub-hosted only)
+        if: ${{ !contains(runner.name, 'self-hosted') && runner.environment != 'self-hosted' }}
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
 
-      - name: Install uv
+      - name: Install uv (GitHub-hosted only)
+        if: ${{ !contains(runner.name, 'self-hosted') && runner.environment != 'self-hosted' }}
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+
+      - name: Verify Python and uv available
+        run: |
+          echo "Python: $(which python3 || which python)"
+          python3 --version || python --version
+          echo "UV: $(which uv)"
+          uv --version
 
       - name: Configure git for private repos
         run: |
@@ -100,7 +114,6 @@ jobs:
           uv run pytest --cov --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage reports
-        if: matrix.python-version == '3.12'
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -116,15 +129,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      # Only setup Python on GitHub-hosted runners
+      - name: Set up Python (GitHub-hosted only)
+        if: ${{ !contains(runner.name, 'self-hosted') && runner.environment != 'self-hosted' }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install uv
+      - name: Install uv (GitHub-hosted only)
+        if: ${{ !contains(runner.name, 'self-hosted') && runner.environment != 'self-hosted' }}
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
+
+      - name: Verify Python and uv available
+        run: |
+          echo "Python: $(which python3 || which python)"
+          python3 --version || python --version
+          echo "UV: $(which uv)"
+          uv --version
 
       - name: Configure git for private repos
         run: |
