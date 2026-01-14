@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+
 import pytest
 
 from app.server import cache, mcp
@@ -335,3 +337,100 @@ class TestSustainabilityGuidePrompt:
         """Test that guide mentions secret computation."""
         result = self._call_template_guide()
         assert "secret" in result.lower()
+
+
+class TestToolSchemas:
+    """Tests for tool JSON schema generation.
+
+    These tests ensure MCP tool schemas have proper required arrays,
+    descriptions, and type declarations for LLM compatibility.
+    """
+
+    @pytest.fixture
+    def tools(self) -> dict:
+        """Get all registered tools from the MCP server."""
+
+        async def get_tools():
+            return await mcp._tool_manager.get_tools()
+
+        return asyncio.run(get_tools())
+
+    def test_create_building_project_has_required(self, tools: dict) -> None:
+        """Test create_building_project has required fields."""
+        tool = tools["create_building_project"]
+        params = tool.parameters
+        assert "required" in params
+        assert "name" in params["required"]
+        assert "floor_area_sqm" in params["required"]
+        assert "construction_year" in params["required"]
+
+    def test_add_energy_data_has_required(self, tools: dict) -> None:
+        """Test add_energy_data has required fields."""
+        tool = tools["add_energy_data"]
+        params = tool.parameters
+        assert "required" in params
+        assert "project_id" in params["required"]
+        assert "year" in params["required"]
+        assert "consumption_kwh" in params["required"]
+
+    def test_add_consumption_data_has_required(self, tools: dict) -> None:
+        """Test add_consumption_data has required fields."""
+        tool = tools["add_consumption_data"]
+        params = tool.parameters
+        assert "required" in params
+        required = params["required"]
+        assert "project_id" in required
+        assert "year" in required
+        assert "category" in required
+        assert "value" in required
+        assert "unit" in required
+
+    def test_analysis_tools_have_required_project_id(self, tools: dict) -> None:
+        """Test all analysis tools require project_id."""
+        analysis_tools = [
+            "calculate_energy_intensity",
+            "calculate_carbon_footprint",
+            "check_eu_taxonomy_alignment",
+            "check_data_completeness",
+            "suggest_data_sources",
+        ]
+        for tool_name in analysis_tools:
+            tool = tools[tool_name]
+            params = tool.parameters
+            assert "required" in params, f"{tool_name} missing 'required'"
+            assert "project_id" in params["required"], f"{tool_name} missing project_id"
+
+    def test_all_properties_have_descriptions(self, tools: dict) -> None:
+        """Test all tool properties have description fields."""
+        for tool_name, tool in tools.items():
+            params = tool.parameters
+            properties = params.get("properties", {})
+            for prop_name, prop_schema in properties.items():
+                assert "description" in prop_schema, (
+                    f"{tool_name}.{prop_name} missing description"
+                )
+
+    def test_all_properties_have_types(self, tools: dict) -> None:
+        """Test all tool properties have type declarations."""
+        for tool_name, tool in tools.items():
+            params = tool.parameters
+            properties = params.get("properties", {})
+            for prop_name, prop_schema in properties.items():
+                # Type can be in 'type' field or in 'anyOf' for union types
+                has_type = "type" in prop_schema or "anyOf" in prop_schema
+                assert has_type, f"{tool_name}.{prop_name} missing type"
+
+    def test_get_cached_result_has_required(self, tools: dict) -> None:
+        """Test get_cached_result has required ref_id."""
+        tool = tools["get_cached_result"]
+        params = tool.parameters
+        assert "required" in params
+        assert "ref_id" in params["required"]
+
+    def test_mcp_tool_output_has_input_schema(self, tools: dict) -> None:
+        """Test MCP protocol tool output has inputSchema."""
+        tool = tools["create_building_project"]
+        mcp_tool = tool.to_mcp_tool()
+        assert mcp_tool.inputSchema is not None
+        assert "required" in mcp_tool.inputSchema
+        assert "properties" in mcp_tool.inputSchema

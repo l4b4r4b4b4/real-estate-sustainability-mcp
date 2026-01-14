@@ -22,9 +22,12 @@ services:
     ports:
       - "8000:8000"
     environment:
+      - DATABASE_PATH=/data/data.db
       - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY:-}
       - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY:-}
       - LANGFUSE_HOST=${LANGFUSE_HOST:-https://cloud.langfuse.com}
+    volumes:
+      - mcp-data:/data
     restart: unless-stopped
 
   # Development server with hot reload
@@ -38,7 +41,9 @@ services:
       - "8000:8000"
     volumes:
       - ./app:/app/app:ro
+      - mcp-data-dev:/data
     environment:
+      - DATABASE_PATH=/data/data.db
       - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY:-}
       - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY:-}
       - LANGFUSE_HOST=${LANGFUSE_HOST:-https://cloud.langfuse.com}
@@ -55,3 +60,9 @@ services:
     image: ghcr.io/l4b4r4b4b4/real-estate-sustainability-mcp-base:latest
     profiles:
       - build
+
+volumes:
+  mcp-data:
+    name: real-estate-sustainability-mcp-data
+  mcp-data-dev:
+    name: real-estate-sustainability-mcp-data-dev

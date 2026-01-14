@@ -52,10 +52,18 @@ def create_get_cached_result(cache: RefCache) -> Any:
 
     @traced_tool("get_cached_result")
     async def get_cached_result(
-        ref_id: str,
-        page: int | None = None,
-        page_size: int | None = None,
-        max_size: int | None = None,
+        ref_id: str = Field(..., description="Reference ID to look up"),
+        page: int | None = Field(
+            default=None, ge=1, description="Page number for pagination (1-indexed)"
+        ),
+        page_size: int | None = Field(
+            default=None, ge=1, le=100, description="Number of items per page"
+        ),
+        max_size: int | None = Field(
+            default=None,
+            ge=1,
+            description="Maximum preview size (tokens/chars). Overrides defaults.",
+        ),
     ) -> dict[str, Any]:
         """Retrieve a cached result, optionally with pagination.
 

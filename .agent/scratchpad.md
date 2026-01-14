@@ -1,8 +1,8 @@
 # Real Estate Sustainability MCP - Agent Scratchpad
 
-## Current Status: 🟢 Phase 1 Complete - Ready for v0.0.2
+## Current Status: 🟢 Phase 1 Complete - Schema Polish Done
 
-**Last Updated**: 2026-01-14 (Session 4 End)
+**Last Updated**: 2026-01-15 (Session 6)
 
 ## Project Overview
 
@@ -40,14 +40,19 @@
 - ✅ Analysis-specific requirements system implemented
 - ✅ Interactive testing of ESG tools completed
 - ✅ Comprehensive test suite for ESG tools (tests/test_esg.py)
-- 🟡 Publish v0.0.2 to PyPI (next step)
-- 🟡 Testing with Flowise agents (after publish)
-- 🔴 Flowise integration blocked (Docker networking - needs Compose setup)
+- ✅ Published v0.0.2 to PyPI
+- ✅ CI fixed for NixOS self-hosted runner
+- ✅ Pre-commit hooks auto-install in flake.nix
+- ✅ Goal 05: Schema investigation complete - schemas already correct!
+- ✅ Added 8 schema validation tests (132 tests total)
+- ✅ Fixed `get_cached_result` missing descriptions
+- ✅ Created `scripts/inspect_schemas.py` for debugging
+- 🟡 Flowise integration - needs testing (issue may be Flowise-side)
 
 ### Test Status
 
 ```
-124 passed in 3.00s
+132 passed in 3.05s
 ```
 
 ### Session 4 Testing Results (Klöpperhaus)
@@ -116,7 +121,8 @@ See `.agent/goals/04-Certification-System-Implementation/scratchpad.md` for full
 | 01 | Clean Up Template Demo Tools | 🟢 Complete | P0 |
 | 02 | Minimal Working Server | 🟢 Complete | P0 |
 | 03 | Publish v0.0.0 to PyPI | 🟢 Complete | P0 |
-| 04 | ESG Assessment for Bestandsgebäude | 🟡 Phase 1 Complete, Testing | P1 |
+| 04 | ESG Assessment for Bestandsgebäude | 🟡 Phase 1 Complete, v0.0.2 Published | P1 |
+| 05 | Tool Schema Polish for MCP/LLM | 🟢 Complete | P0 |
 
 ### Status Indicators
 - 🟢 Complete
@@ -136,6 +142,43 @@ See `.agent/goals/04-Certification-System-Implementation/scratchpad.md` for full
 - **S3 storage for Phase 4+**: Generated assets (reports, exports) to S3 with RefCache permission integration
 
 ## Session Log
+
+### Session 6 - Schema Investigation (2026-01-15)
+
+**Objective**: Fix tool schemas to enable Flowise LLM integration
+
+**Investigation Results**:
+1. **Original hypothesis was WRONG** - Schemas already have `required` arrays
+2. Verified via Python inspection that FastMCP generates correct JSON schemas:
+   - All tools have `required` arrays
+   - All properties have `description` fields
+   - All properties have `type` declarations
+3. The Flowise error is likely caused by:
+   - Flowise caching old schemas
+   - LLM model not interpreting `required` arrays correctly
+   - Flowise MCP connector bug
+
+**Fixes Applied**:
+1. ✅ Added `Field()` annotations with descriptions to `get_cached_result`
+2. ✅ Added 8 schema validation tests in `TestToolSchemas`
+3. ✅ Created `scripts/inspect_schemas.py` for debugging
+
+**Test Results**:
+- 132 tests passing (124 original + 8 new schema tests)
+- All linting clean
+
+**Files Modified**:
+- `app/tools/cache.py` - Added Field() descriptions to get_cached_result
+- `tests/test_server.py` - Added TestToolSchemas class (8 tests)
+- `scripts/inspect_schemas.py` - NEW: Schema inspection script
+- `.agent/goals/05-Tool-Schema-Polish/scratchpad.md` - Documented findings
+
+**Next Steps**:
+- Test with Flowise (restart to clear cached schemas)
+- If issue persists, check Flowise MCP connector logs
+- Release v0.0.3 if needed
+
+---
 
 ### Session 4 - Testing & Architecture (2026-01-14)
 
