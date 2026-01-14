@@ -314,8 +314,9 @@ class BuildingStore:
 
         with self._get_connection() as conn:
             cursor = conn.cursor()
+            # Column names are from validated Pydantic fields, not user input
             cursor.execute(
-                f"UPDATE building_projects SET {', '.join(updates)} WHERE project_id = ?",
+                f"UPDATE building_projects SET {', '.join(updates)} WHERE project_id = ?",  # nosec B608
                 values,
             )
 
