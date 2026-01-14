@@ -17,6 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DGNB evaluation tools
 - IFC file parsing for building information modeling
 
+## [0.0.1] - 2026-01-14
+
+### Fixed
+
+- Replace remaining `fastmcp-template` references with correct project name
+- Update CLI app name and help text
+- Update SQLite cache path in config
+- Update test docstrings
+
 ## [0.0.0] - 2026-01-14
 
 ### Added
@@ -53,5 +62,6 @@ This is the first experimental release. The package structure and release
 workflow are validated, but domain-specific sustainability tools are not
 yet implemented. See "Planned" section for upcoming features.
 
-[Unreleased]: https://github.com/l4b4r4b4b4/real-estate-sustainability-mcp/compare/v0.0.0...HEAD
+[Unreleased]: https://github.com/l4b4r4b4b4/real-estate-sustainability-mcp/compare/v0.0.1...HEAD
+[0.0.1]: https://github.com/l4b4r4b4b4/real-estate-sustainability-mcp/compare/v0.0.0...v0.0.1
 [0.0.0]: https://github.com/l4b4r4b4b4/real-estate-sustainability-mcp/releases/tag/v0.0.0
